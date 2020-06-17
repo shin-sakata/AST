@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser exposing (application)
 import Browser.Navigation as Nav
@@ -6,7 +6,9 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Page.About as About
 import Page.Home as Home
-import Route
+import Page.NotFound as NotFound
+import Route exposing (Route)
+import Session exposing (Session)
 import Url
 
 
@@ -26,36 +28,53 @@ main =
 -- MODEL
 
 
-type alias Model =
-    { key : Nav.Key
-    , url : Url.Url
-    , page : PageModel
-    }
-
-
-type PageModel
-    = Home Home.Model
-    | About About.Model
+type Model
+    = HomeModel Home.Model
+    | AboutModel About.Model
+    | NotFoundModel NotFound.Model
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    case Route.router url of
+    let
+        sess : Session
+        sess =
+            Session.Session key url
+    in
+    pageInit (Route.router url) sess
+
+
+pageInit : Route -> Session -> ( Model, Cmd Msg )
+pageInit route sess =
+    case route of
         Route.Home ->
-            ( { key = key
-              , url = url
-              , page = Home ()
-              }
-            , Cmd.none
-            )
+            Home.init sess |> subToMain HomeModel HomeMsg
 
         Route.About ->
-            ( { key = key
-              , url = url
-              , page = About ()
-              }
-            , Cmd.none
-            )
+            About.init sess |> subToMain AboutModel AboutMsg
+
+        Route.NotFound ->
+            NotFound.init sess |> subToMain NotFoundModel NotFoundMsg
+
+
+subToMain : (subModel -> Model) -> (subMsg -> Msg) -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
+subToMain toMainModel toMainMsg ( subModel, subCmd ) =
+    ( toMainModel subModel
+    , Cmd.map toMainMsg subCmd
+    )
+
+
+toSession : Model -> Session
+toSession model =
+    case model of
+        HomeModel subModel ->
+            Home.toSession subModel
+
+        AboutModel subModel ->
+            About.toSession subModel
+
+        NotFoundModel subModel ->
+            NotFound.toSession subModel
 
 
 
@@ -65,30 +84,34 @@ init _ url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | HomeMsg Home.Msg
+    | AboutMsg About.Msg
+    | NotFoundMsg NotFound.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        LinkClicked urlRequest ->
+    case ( msg, model ) of
+        ( LinkClicked urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key (Url.toString url) )
+                    ( model, Nav.pushUrl (toSession model).key (Url.toString url) )
 
                 Browser.External href ->
                     ( model, Nav.load href )
 
-        UrlChanged url ->
-            case Route.router url of
-                Route.Home ->
-                    ( { model | url = url, page = Home () }
-                    , Cmd.none
-                    )
+        ( UrlChanged url, _ ) ->
+            pageInit (Route.router url) (toSession model)
 
-                Route.About ->
-                    ( { model | url = url, page = About () }
-                    , Cmd.none
-                    )
+        ( HomeMsg subMsg, HomeModel subModel ) ->
+            Home.update subMsg subModel |> subToMain HomeModel HomeMsg
+
+        ( AboutMsg subMsg, AboutModel subModel ) ->
+            About.update subMsg subModel |> subToMain AboutModel AboutMsg
+
+        -- 違うページのコマンドは実質バグってるので無視
+        ( _, _ ) ->
+            ( model, Cmd.none )
 
 
 
@@ -96,8 +119,16 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
+subscriptions model =
+    case model of
+        HomeModel subModel ->
+            Sub.map HomeMsg (Home.subscriptions subModel)
+
+        AboutModel subModel ->
+            Sub.map AboutMsg (About.subscriptions subModel)
+
+        NotFoundModel subModel ->
+            Sub.map NotFoundMsg (NotFound.subscriptions subModel)
 
 
 
@@ -106,22 +137,12 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    case model.page of
-        Home m ->
-            Home.view m
+    case model of
+        HomeModel subModel ->
+            Home.view subModel
 
-        About m ->
-            About.view m
+        AboutModel subModel ->
+            About.view subModel
 
-
-footer : Html msg
-footer =
-    ul []
-        [ viewLink "/home"
-        , viewLink "/about"
-        ]
-
-
-viewLink : String -> Html msg
-viewLink path =
-    li [] [ a [ href path ] [ text path ] ]
+        NotFoundModel subModel ->
+            NotFound.view subModel

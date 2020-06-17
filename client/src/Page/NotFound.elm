@@ -1,4 +1,4 @@
-module Page.About exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
+module Page.NotFound exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import Browser
 import Html exposing (..)
@@ -44,8 +44,8 @@ update msg model =
 
 view : Model -> Browser.Document msg
 view _ =
-    { title = "about"
-    , body = [ h1 [] [ text "About!" ] ]
+    { title = "not found"
+    , body = [ text "NOT FOUND" ]
     }
 
 
