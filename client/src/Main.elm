@@ -39,7 +39,7 @@ init _ url key =
     let
         sess : Session
         sess =
-            Session.Session key url
+            Session key url
     in
     pageInit (Route.router url) sess
 
