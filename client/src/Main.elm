@@ -4,6 +4,9 @@ import Browser exposing (application)
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Page.About as About
+import Page.Home as Home
+import Route
 import Url
 
 
@@ -26,12 +29,33 @@ main =
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
+    , page : PageModel
     }
+
+
+type PageModel
+    = Home Home.Model
+    | About About.Model
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    ( Model key url, Cmd.none )
+    case Route.router url of
+        Route.Home ->
+            ( { key = key
+              , url = url
+              , page = Home ()
+              }
+            , Cmd.none
+            )
+
+        Route.About ->
+            ( { key = key
+              , url = url
+              , page = About ()
+              }
+            , Cmd.none
+            )
 
 
 
@@ -55,9 +79,16 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            ( { model | url = url }
-            , Cmd.none
-            )
+            case Route.router url of
+                Route.Home ->
+                    ( { model | url = url, page = Home () }
+                    , Cmd.none
+                    )
+
+                Route.About ->
+                    ( { model | url = url, page = About () }
+                    , Cmd.none
+                    )
 
 
 
@@ -75,19 +106,20 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "URL Interceptor"
-    , body =
-        [ text "The current URL is: "
-        , b [] [ text (Url.toString model.url) ]
-        , ul []
-            [ viewLink "/home!"
-            , viewLink "/profile"
-            , viewLink "/reviews/the-century-of-the-self"
-            , viewLink "/reviews/public-opinion"
-            , viewLink "/reviews/shah-of-shahs"
-            ]
+    case model.page of
+        Home m ->
+            Home.view m
+
+        About m ->
+            About.view m
+
+
+footer : Html msg
+footer =
+    ul []
+        [ viewLink "/home"
+        , viewLink "/about"
         ]
-    }
 
 
 viewLink : String -> Html msg

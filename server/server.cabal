@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 010e482106240c7867cb35e772b89ba40a40dcb535d8c0c9d07e25ca98db6982
+-- hash: 2022ee9e6a050bb51093edd2b9f57944213859417f63d65ac363a46e6b325c21
 
 name:           server
 version:        0.1.0.0
@@ -27,7 +27,6 @@ source-repository head
 
 library
   exposed-modules:
-      Html
       Lib
   other-modules:
       Paths_server
