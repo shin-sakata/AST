@@ -6,6 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Page.About as About
 import Page.Home as Home
+import Page.Login as Login
 import Page.NotFound as NotFound
 import Route exposing (Route)
 import Session exposing (Session)
@@ -31,6 +32,7 @@ main =
 type Model
     = HomeModel Home.Model
     | AboutModel About.Model
+    | LoginModel Login.Model
     | NotFoundModel NotFound.Model
 
 
@@ -53,6 +55,9 @@ pageInit route sess =
         Route.About ->
             About.init sess |> subToMain AboutModel AboutMsg
 
+        Route.Login ->
+            Login.init sess |> subToMain LoginModel LoginMsg
+
         Route.NotFound ->
             NotFound.init sess |> subToMain NotFoundModel NotFoundMsg
 
@@ -73,6 +78,9 @@ toSession model =
         AboutModel subModel ->
             About.toSession subModel
 
+        LoginModel subModel ->
+            Login.toSession subModel
+
         NotFoundModel subModel ->
             NotFound.toSession subModel
 
@@ -86,6 +94,7 @@ type Msg
     | UrlChanged Url.Url
     | HomeMsg Home.Msg
     | AboutMsg About.Msg
+    | LoginMsg Login.Msg
     | NotFoundMsg NotFound.Msg
 
 
@@ -127,6 +136,9 @@ subscriptions model =
         AboutModel subModel ->
             Sub.map AboutMsg (About.subscriptions subModel)
 
+        LoginModel subModel ->
+            Sub.map LoginMsg (Login.subscriptions subModel)
+
         NotFoundModel subModel ->
             Sub.map NotFoundMsg (NotFound.subscriptions subModel)
 
@@ -143,6 +155,9 @@ view model =
 
         AboutModel subModel ->
             About.view subModel
+
+        LoginModel subModel ->
+            Login.view subModel
 
         NotFoundModel subModel ->
             NotFound.view subModel
