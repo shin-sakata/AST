@@ -1,7 +1,9 @@
 module Page.Home exposing (Model, Msg(..), init, subscriptions, toSession, update, view)
 
 import Browser
+import Bulma as B
 import Html exposing (..)
+import Layout exposing (navigationBar)
 import Session exposing (Session)
 
 
@@ -44,8 +46,11 @@ update msg model =
 
 view : Model -> Browser.Document msg
 view _ =
-    { title = "home"
-    , body = [ h1 [] [ text "Home!" ] ]
+    { title = "HOME"
+    , body =
+        [ navigationBar
+        , div [ B.section ] [ h1 [ B.title ] [ text "HOME" ] ]
+        ]
     }
 
 

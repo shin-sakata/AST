@@ -9,10 +9,11 @@ module Page.Login exposing
     )
 
 import Browser
+import Bulma as B
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Layout exposing (navigationBar)
 import Session exposing (Session)
-import Bulma as B
 
 
 
@@ -61,7 +62,8 @@ view _ =
 
 body : List (Html msg)
 body =
-    [ section [ B.section ]
+    [ navigationBar
+    , section [ B.section ]
         [ layout
         ]
     ]
@@ -69,21 +71,22 @@ body =
 
 layout : Html msg
 layout =
-    div [ B.columns ]
-        [ div [ B.column, B.isHalf, B.isCentered, B.isOffsetOneFifth ]
-            [ h1 [ B.title ] [ text "Login" ]
-            , container
-            ]
-        ]
+    div [] [ container ]
 
 
 container : Html msg
 container =
-    div [ B.container ]
-        [ div [ B.box ]
-            [ field "Email" "email" "ex@mple.com"
-            , field "Password" "password" "password"
-            ]
+    div [ B.container, style "max-width" "500px" ]
+        [ h1 [ B.title ] [ text "Login" ]
+        , loginBox
+        ]
+
+
+loginBox : Html msg
+loginBox =
+    div [ B.box ]
+        [ field "Email" "email" "ex@mple.com"
+        , field "Password" "password" "password"
         ]
 
 
