@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "npx parcel src/index.ts --out-dir dist --no-source-maps",
+    "watch": "npx parcel src/index.ts --out-dir public/dist --no-source-maps",
     "serve": "npx http-server",
-    "build": "npx parcel build src/index.ts --out-dir dist --no-source-maps"
+    "build": "npx parcel build src/index.ts --out-dir public/dist --no-source-maps"
   },
   "author": "",
   "license": "ISC",

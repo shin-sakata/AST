@@ -85,16 +85,32 @@ container =
 loginBox : Html msg
 loginBox =
     div [ B.box ]
-        [ field "Email" "email" "ex@mple.com"
-        , field "Password" "password" "password"
+        [ emailField
+        , passwordField
         ]
 
 
-field : String -> String -> String -> Html msg
-field label__ type__ placeholder__ =
+emailField : Html msg
+emailField =
     div [ B.field ]
-        [ label [ B.label ] [ text label__ ]
-        , div [ B.control ] [ input [ B.input, type_ type__, placeholder placeholder__ ] [] ]
+        [ label [ B.label ] [ text "Emal" ]
+        , p [ class "control has-icons-left has-icons-right" ]
+            [ input [ class "input", placeholder "Email", type_ "email" ] []
+            , span [ class "icon is-small is-left" ]
+                [ i [ class "fas fa-envelope" ] [] ]
+            ]
+        ]
+
+
+passwordField : Html msg
+passwordField =
+    div [ B.field ]
+        [ label [ B.label ] [ text "Password" ]
+        , p [ class "control has-icons-left has-icons-right" ]
+            [ input [ class "input", placeholder "Password", type_ "password" ] []
+            , span [ class "icon is-small is-left" ]
+                [ i [ class "fas fa-lock" ] [] ]
+            ]
         ]
 
 

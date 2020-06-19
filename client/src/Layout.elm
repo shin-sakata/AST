@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 
 navigationBar : Html msg
 navigationBar =
-    nav [ B.navbar ]
+    nav [ B.navbar, B.hasShadow ]
         [ div [ B.navbarBrand ]
             [ a [ B.navbarItem, href "/" ]
                 [ img [ attribute "height" "28", src "https://bulma.io/images/bulma-logo.png", attribute "width" "112" ] []
